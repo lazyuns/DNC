@@ -1,0 +1,144 @@
+file:
+  upload:
+    dir: ${user.dir}/uploads/
+    url-path: /images/
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+storage:
+  type: ${STORAGE_TYPE:local}
+  s3:
+    bucket: ${S3_BUCKET:}
+    region: ${S3_REGION:}
+    public-url: ${S3_PUBLIC_URL:}
+    access-key: ${AWS_ACCESS_KEY_ID:}
+    secret-key: ${AWS_SECRET_ACCESS_KEY:}
+
+ai:
+  server:
+    base-url: ${AI_SERVER_BASE_URL:http://localhost:8000}
+
+spring:
+  config:
+    import: "optional:file:./.env"
+  task:
+    scheduling:
+      enabled: true # 스케줄링 기능인
+  application:
+    name: dnc
+  servlet:
+    multipart:
+      # 선택: 임시 업로드 위치 재정의
+      # location: ${user.home}/uploads
+      file-size-threshold: 10MB
+      max-file-size: 10MB
+      max-request-size: 50MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/dnc_db?serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      idle-timeout: 300000
+      minimum-idle: 3
+      maximum-pool-size: 5
+      connection-timeout: 600000
+      # data-source-properties:  <-- 로그가 시끄러우면
+      #   profileSQL: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false       # SQL 로그 끄기
+    properties:
+      hibernate:
+        format_sql: false # SQL 예쁘게 출력하기도 끄기
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: ERROR        # 쿼리 로그는 에러 날 때만!
+    org.hibernate.type: ERROR       # 파라미터 값 로그 숨기기
+    com.zaxxer.hikari: ERROR        # DB 연결 로그 숨기기
+    org.springframework.security: INFO
+    com.djjko.dnc.glucose: WARN     # 로그 숨기기
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration_time: ${JWT_EXPIRATION_TIME:3600000} # 1시간
+  refresh_expiration_time: ${JWT_REFRESH_EXPIRATION_TIME:604800000} # 7일
+
+oauth:
+  providers:
+    dexcom:
+      client-id: ${DEXCOM_CLIENT_ID:}
+      client-secret: ${DEXCOM_CLIENT_SECRET:}
+      redirect-uri: ${DEXCOM_REDIRECT_URI:http://localhost:8080/api/v1/oauth/dexcom/callback}
+      auth-uri: ${DEXCOM_AUTH_URI:https://sandbox-api.dexcom.com/v3/oauth2/login}
+      token-uri: ${DEXCOM_TOKEN_URI:https://sandbox-api.dexcom.com/v3/oauth2/token}
+      revoke-uri: ${DEXCOM_REVOKE_URI:}
+      api-base: ${DEXCOM_API_BASE:https://sandbox-api.dexcom.com/v3}
+      scopes:
+        - offline_access
+    caresense:
+      client-id: ${CARESENSE_CLIENT_ID:}
+      client-secret: ${CARESENSE_CLIENT_SECRET:}
+      redirect-uri: ${CARESENSE_REDIRECT_URI:http://localhost:8080/api/v1/oauth/caresense/callback}
+      auth-uri: ${CARESENSE_AUTH_URI:}
+      token-uri: ${CARESENSE_TOKEN_URI:}
+      scopes: []
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:}
+      client-secret: ${GOOGLE_CLIENT_SECRET:}
+      redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/api/v1/login/google/callback}
+      auth-uri: ${GOOGLE_AUTH_URI:https://accounts.google.com/o/oauth2/v2/auth}
+      token-uri: ${GOOGLE_TOKEN_URI:https://oauth2.googleapis.com/token}
+      user-info-uri: ${GOOGLE_USER_INFO_URI:https://openidconnect.googleapis.com/v1/userinfo}
+      scopes:
+        - openid
+        - email
+        - profile
+    kakao:
+      client-id: ${KAKAO_CLIENT_ID:}
+      client-secret: ${KAKAO_CLIENT_SECRET:}
+      redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/api/v1/login/kakao/callback}
+      auth-uri: ${KAKAO_AUTH_URI:https://kauth.kakao.com/oauth/authorize}
+      token-uri: ${KAKAO_TOKEN_URI:https://kauth.kakao.com/oauth/token}
+      user-info-uri: ${KAKAO_USER_INFO_URI:https://kapi.kakao.com/v2/user/me}
+      scopes:
+        - profile_nickname
+        - account_email
+    naver:
+      client-id: ${NAVER_CLIENT_ID:}
+      client-secret: ${NAVER_CLIENT_SECRET:}
+      redirect-uri: ${NAVER_REDIRECT_URI:http://localhost:8080/api/v1/login/naver/callback}
+      auth-uri: ${NAVER_AUTH_URI:https://nid.naver.com/oauth2.0/authorize}
+      token-uri: ${NAVER_TOKEN_URI:https://nid.naver.com/oauth2.0/token}
+      user-info-uri: ${NAVER_USER_INFO_URI:https://openapi.naver.com/v1/nid/me}
+      scopes:
+        - email
+        - name
+        - profile
+
+app:
+  social-login-redirect-uri: ${APP_SOCIAL_LOGIN_REDIRECT_URI:testapp://auth}
+  social-login-redirect-uri-web: ${APP_SOCIAL_LOGIN_REDIRECT_URI_WEB:http://localhost:3000/auth}
+  oauth-redirect-uri: ${APP_OAUTH_REDIRECT_URI:testapp://oauth}
+
+gms:
+  api-key: ${GMS_API_KEY}
+  ai:
+    model: ${GMS_AI_MODEL:gemini-2.5-pro}
+    base-url: ${GMS_AI_BASE_URL:https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com}
+firebase:
+  service-account: ${FIREBASE_SERVICE_ACCOUNT:}
